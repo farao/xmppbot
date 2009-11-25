@@ -1,1 +1,1 @@
-Using exmpp, which should be somewhere in the erlang path.
+Using exmpp and erlotr (http://github.com/sg2342/erlotr), which should be somewhere in the erlang path.

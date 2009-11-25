@@ -1,5 +1,5 @@
 -module(erlbot).
--export([start/0,start/2,start/3]).
+-export([start/2,start/3]).
 
 -include_lib("exmpp/include/exmpp.hrl").
 -include_lib("exmpp/include/exmpp_client.hrl").
@@ -21,8 +21,8 @@ start(LoginName, ServerName, ServerPort) ->
 	Session = connect(ServerName, ServerPort, LoginName, Password),
 	login(Session),
 	OTRControl = start_otr(),
-	io:format("OTRControl: ~p~n", [OTRControl]),
-	process_messages(Session, OTRControl).
+	process_messages(Session, OTRControl),
+	done.
 
 getPW() ->
 	{ok, Passwort} = io:fread("Passwort: ", "~s"),
@@ -59,7 +59,7 @@ start_otr() ->
 	CNF = fun(M) -> io:format("INJECT into NET ~p~n", [M]) end,
 	CUF = fun(M) -> io:format("INJECT into USER ~p~n", [M]) end,
 	{ok, ControlFun} = otr:create_context([{emit_user, CUF}, {emit_net, CNF}, {dsa, ?DSAKEY}]),
-	ControlFun({user, start_otr}),
+	%ControlFun({user, start_otr}),
 	ControlFun.
 
 process_messages(Session, OTRControl) ->
@@ -68,8 +68,8 @@ process_messages(Session, OTRControl) ->
 			exmpp_session:stop(Session);
 		Message = #received_packet{packet_type=message, raw_packet=Packet} ->
 			io:format("Packet: ~p~n", [Message]),
-			NewPacket = OTRControl({net, Packet}),
-			io:format(" NewPacket: ~p~n", [NewPacket]),
+			%NewPacket = OTRControl(.....),
+			%io:format(" NewPacket: ~p~n", [NewPacket]),
 			send_packet(Session, Packet),
 			process_messages(Session, OTRControl);
 		_ -> process_messages(Session, OTRControl)
